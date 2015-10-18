@@ -1,3 +1,4 @@
+from itertools import islice
 from django.shortcuts import  get_object_or_404, render
 # from django.http import HttpResponse
 # from django.template import RequestContext, loader
@@ -12,11 +13,8 @@ from .forms import UserForm, UserProfileForm, TopicForm
 from .models import Topic, UserProfile
 from .bing_search import run_query
 import random
-<<<<<<< HEAD
-num_rel_init = 20
-=======
 from newspaper import Article
->>>>>>> 91c588ef7ffd43eea93bef0345f8d26e27760e85
+num_rel_init = 10
 
 # from alchemyapi import AlchemyAPI
 # alchemyapi = AlchemyAPI()
@@ -34,7 +32,7 @@ def index(request):
 	context = {'latest_topic_list': latest_topic_list}
 	return render(request, 'summarizer/index.html', context)
 
-def get_related(topic):
+def get_keywords(topic):
     plcontinue = None
     cont = True
     keywords = []
@@ -50,6 +48,7 @@ def get_related(topic):
 
         cont = "continue" in json
         plcontinue = json["continue"]["plcontinue"] if "continue" in json else None
+
     return keywords
 
 def get_topics(request):
@@ -63,23 +62,20 @@ def get_topics(request):
             # ...
             # redirect to a new URL:
             topic = form.cleaned_data['topic']
-            rand_keywords = random.sample(keywords, num_rel_init)
-            graph = []
-            final_keywords = []
-            for currNode in rand_keywords:
-                graph[currNode] = []
-                for currNeighbor in get_related(currNode):
-                    if currNeighbor in rand_keywords:
-                        graph[currNode].append(currNeighbor)
-            sorted_keys = sorted(graph, key=lambda x: len(graph[x]), reversed=True)
-            for x in range(6):
-                final_keywords.append(sorted_keys(x))
-            print (final_keywords)    
 
-            #print(keywords)
+            rand_keywords = random.sample(get_keywords(topic), num_rel_init)
+            graph = { }
 
-            #rand_keywords = random.sample(keywords, 10)
-            # print(rand_keywords)
+            for curr_node in rand_keywords:
+                graph[curr_node] = []
+                for curr_neighbor in get_keywords(curr_node):
+                    if curr_neighbor in rand_keywords:
+                        graph[curr_node].append(curr_neighbor)
+
+            sorted_keys = sorted(graph, key=lambda x : len(graph[x]), reverse=True)
+
+            final_keywords = list(islice(sorted_keys, 5))
+            print(final_keywords)    
 
             result_list = []
 
