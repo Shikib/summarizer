@@ -12,6 +12,7 @@ from .forms import UserForm, UserProfileForm, TopicForm
 
 from .models import Topic, UserProfile
 from .bing_search import run_query
+from .twit_search import get_tweets
 from newspaper import Article
 import random
 import summarizer.data
@@ -29,12 +30,9 @@ KEY = '745df69626f8ab2cdcc2c783f2cf5038:18:73241801'
 # Create your views here.
 
 def index(request):
-	latest_topic_list = Topic.objects.order_by('-title')
-
-	context = {'latest_topic_list': latest_topic_list}
-	return render(request, 'summarizer/index.html', context)
-
-
+    latest_topic_list = Topic.objects.order_by('-title')
+    context = {'latest_topic_list': latest_topic_list}
+    return render(request, 'summarizer/index.html', context)
 
 def get_topics(request):
     # if this is a POST request we need to process the form data
@@ -51,6 +49,8 @@ def get_topics(request):
             print("dfq")
             keywords = summarizer.data.get_keywords(topic)
             print(keywords)
+
+            """
             best_words = summarizer.data.best_keywords(keywords)
             keyword_scores = summarizer.data.keyword_scores(topic, best_words)
             urls = summarizer.data.get_urls(best_words)
@@ -72,6 +72,7 @@ def get_topics(request):
                 # except:
                 #     print ("exception")
                 #     pass
+                """
 
 
             #### NYT api call ####
@@ -90,9 +91,15 @@ def get_topics(request):
             #         print ("================= \n ================= \n")
             #         result_list.append(url)
 
+            twit_results = get_tweets(topic)
+            # result_list = urls
+            result_list = [] # temp
 
-
-            return render(request, 'summarizer/index.html', {'result_list': urls})
+            return render(request, 'summarizer/index.html', \
+                    { 'twitter_results': twit_results if len(twit_results) > 0 else None,
+                      'result_list': result_list if len(result_list) > 0 else None,
+                      'any': len(result_list) + len(twit_results) > 0
+                      })
 
 
     # if a GET (or any other method) we'll create a blank form

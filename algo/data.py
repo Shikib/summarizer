@@ -79,7 +79,6 @@ def keyword_scores(topic, best_keywords):
        keyword_scores[word] = tf*idf
     return keyword_scores
 
-
 def get_topics(topic):
     keywords = get_keywords(topic)
     best_keywords = best_keywords(keywords)

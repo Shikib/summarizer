@@ -4,6 +4,7 @@ import sys
 
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError
+from urllib.parse import quote
 
 
 API_ENDPOINT = 'https://api.twitter.com'
@@ -70,7 +71,7 @@ class Client(object):
 
 def get_tweets(topic):
     client = Client("HbcrOnYMpYrcTmrgFqZeQ1c5N", "QfVQlILJe8q8BJEociUmOSPXSabEQIsiu2crR4JKoxs1CMsrh2")
-    resource_url = "https://api.twitter.com/1.1/search/tweets.json?q=" + urllib.quote_plus(topic) + "%20-filter:retweets&src=typd&count=100"
+    resource_url = "https://api.twitter.com/1.1/search/tweets.json?q=" + quote(topic) + "%20-filter:retweets&src=typd&count=100"
     tweet = client.request(resource_url)
 
     sort = sorted(tweet["statuses"], key=lambda x: x["favorite_count"] + x["retweet_count"], reverse=True)
