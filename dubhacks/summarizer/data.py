@@ -3,21 +3,16 @@ from itertools import islice
 import random
 from .sim import idfs
 from .bing_search import run_query
+import requests
+from newspaper import Article
+
+import summarizer.sim
 
 def get_urls(best_words):
     links = []
     for word in best_words:
         links += run_query(word)
     return links
-
-def extract_text(urls):
-    for link in urls:
-        url = link['link']
-        a = Article(url)
-        a.download()
-        a.parse()
-        print (a.text, '\n')
-        print ("==================\n")
 
 def get_keywords(topic):
     plcontinue = None
@@ -44,7 +39,7 @@ def get_keywords(topic):
 def best_keywords(keywords):
     rand_keywords = random.sample(keywords, min(10, len(keywords)))
     graph = {}
-
+    print(keywords)
     for curr_node in rand_keywords:
         graph[curr_node] = []
         curr_keywords = get_keywords(curr_node)

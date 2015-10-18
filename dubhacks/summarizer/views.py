@@ -15,6 +15,8 @@ from .bing_search import run_query
 from newspaper import Article
 import random
 import summarizer.data
+import summarizer.sim
+import re
 
 # from alchemyapi import AlchemyAPI
 # alchemyapi = AlchemyAPI()
@@ -45,33 +47,53 @@ def get_topics(request):
             # ...
             # redirect to a new URL:
             topic = form.cleaned_data['topic']
-
+            print(topic)
+            print("dfq")
             keywords = summarizer.data.get_keywords(topic)
+            print(keywords)
             best_words = summarizer.data.best_keywords(keywords)
             keyword_scores = summarizer.data.keyword_scores(topic, best_words)
-            urls_list = summarizer.data.get_urls(best_words)
-            summarizer.data.extract_text(urls_list)        
+            urls = summarizer.data.get_urls(best_words)
 
-#            result_list = []
-#            for word in final_keywords:
-#                word = word.replace (" ", "+")
-#                r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
-#                json = r.json()
-#                for i in json["response"]["docs"]:
-#                    result_list.append(i['web_url'])
-        
-#            for word in rand_keywords:
-#                links = run_query(word)
-#                for i in links:
-#                    url = i["link"]
-#                    a = Article(url)
-#                    a.download()
-#                    a.parse()
-#                    print (a.text, "\n")
-#                    print ("================= \n================= \n")
-#        
-#                result_list += links
-            return render(request, 'summarizer/index.html', {'result_list': urls_list})
+            print('got urls!')
+            for link in urls:
+                url = link['link']
+                # try:
+                print("tring url", url)
+                a = Article(url)
+                a.download()
+                a.parse()
+                text = a.text
+                lines = [t.strip() for t in re.split("(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s", text.replace("\n", " "))]
+                print("starting summary")
+                summary = summarizer.sim.summarize(lines, a.title, keyword_scores, 3) 
+                print (summary, '\n')
+                print ("==================\n")
+                # except:
+                #     print ("exception")
+                #     pass
+
+
+            #### NYT api call ####
+            # for word in rand_keywords:
+            #     word = word.replace (" ", "+")
+                
+            #     # r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
+            #     r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=body:'+ word + '&fl=web_url&api-key=' + KEY)
+            #     json = r.json()
+            #     for i in json["response"]["docs"]:
+            #         url = i['web_url']
+            #         a = Article(url)
+            #         a.download()
+            #         a.parse()
+            #         print (a.text, "\n")
+            #         print ("================= \n ================= \n")
+            #         result_list.append(url)
+
+
+
+            return render(request, 'summarizer/index.html', {'result_list': urls})
+
 
     # if a GET (or any other method) we'll create a blank form
     else:
