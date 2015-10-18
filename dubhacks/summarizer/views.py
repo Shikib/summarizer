@@ -62,7 +62,12 @@ def get_topics(request):
                 print("tring url", url)
                 a = Article(url)
                 a.download()
-                a.parse()
+
+                try:
+                    a.parse()
+                except:
+                    continue
+
                 text = a.text
                 lines = [t.strip() for t in re.split("(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s", text.replace("\n", " "))]
                 print("starting summary")
