@@ -2,6 +2,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'dubhacks/style.css' %}" />
 <!-- Compiled and minified CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <body>
       <div class="container">
@@ -11,7 +12,7 @@
 			<div class="card-content white-text">
 				<span class="card-title">{{ topic.title }}</span>
 				{% if user.is_authenticated %}
-				 <a class="waves-effect waves-light btn  pink accent-1 white-text right" href="{% url 'subscribe' topic.id %}" ><i class="material-icons left">done</i>Unsuscribe</a>
+				 <a class="waves-effect waves-light btn  pink accent-1 white-text right" href="{% url 'subscribe' topic.id %}" ><i class="material-icons left">done</i>Suscribe</a>
 				 {% endif %}
 			</div>
 		</div>
