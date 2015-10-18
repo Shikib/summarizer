@@ -17,7 +17,7 @@ def import_idfs(filename):
 
     return ret
 
-idfs = import_idfs("data/BingBodyDec13_Top100KWords.txt")
+idfs = import_idfs("../data/BingBodyDec13_Top100KWords.txt")
 
 def tfs(words):
     """
@@ -111,7 +111,7 @@ def dbfs(sentence, keywords):
     summ = 0.0
     last_score = 0.0
     last_index = 0
-    words = sentence.split():
+    words = sentence.split()
     for i in range(0, len(words)):
         w = words[i]
         if w in keyword.keys():
