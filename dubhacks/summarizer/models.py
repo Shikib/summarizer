@@ -15,6 +15,7 @@ class Topic(models.Model):
 		return self.title
 
 class Summary(models.Model):
+	title = models.TextField(blank=True)
 	text = models.TextField()
 	url = models.URLField(blank=True)
 	date = models.DateTimeField('date updated')

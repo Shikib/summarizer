@@ -22,7 +22,7 @@
     <nav>
         <div class="nav-wrapper">
 
-      <form action="/summarizer/search" method="post">
+      <form action="/summarizer/search/" method="post">
         <div class="input-field search-bar" style="display:none;" >
             {% csrf_token %}
           <input placeholder="What are you interested in today?" id="search" type="search" name="search" required>

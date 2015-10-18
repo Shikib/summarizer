@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import UserForm, UserProfileForm, TopicForm
 
-from .models import Topic, UserProfile
+from .models import Topic, UserProfile, Summary
 from .bing_search import run_query
 from .twit_search import get_tweets
 from newspaper import Article
@@ -18,6 +18,7 @@ import random
 import summarizer.data
 import summarizer.sim
 import re
+from django.utils import timezone
 
 num_rel_init = 10
 
@@ -49,6 +50,8 @@ def get_topics(request):
             # redirect to a new URL:
 
             topic = form.cleaned_data['search']
+            t = Topic(title=topic)
+            t.save()
             print(topic)
             print("dfq")
             keywords = summarizer.data.get_keywords(topic)
@@ -66,11 +69,21 @@ def get_topics(request):
                 print("tring url", url)
                 a = Article(url)
                 a.download()
-                a.parse()
+
+                try:
+                    a.parse()
+                except:
+                    continue
+
                 text = a.text
                 lines = [t.strip() for t in re.split("(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s", text.replace("\n", " "))]
                 print("starting summary")
                 summary = summarizer.sim.summarize(lines, a.title, keyword_scores, 3) 
+
+                s = Summary(title=a.title, text=summary[0], url=url, date=timezone.now())
+                s.save()
+                t.summary_set.add(s)
+
                 print (summary, '\n')
                 print ("==================\n")
                 # except:
