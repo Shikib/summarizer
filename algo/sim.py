@@ -1,4 +1,4 @@
-import math
+import math, string
 
 pos_scores = [0.17, 0.23, 0.14, 0.08, 0.05, 0.04, 0.06, 0.04, 0.04, 0.15, 0]
 epsilon = 1e-10
@@ -10,7 +10,7 @@ def import_idfs(filename):
     """
     ret = { }
     with open(filename) as f:
-        i = 0
+        i = 1
         for line in f.readlines():
             # Discard newline
             ret[line[:-1]] = i
@@ -21,7 +21,7 @@ def import_idfs(filename):
 
     return ret
 
-idfs = import_idfs("../data/BingBodyDec13_Top100KWords.txt")
+idfs = import_idfs("data/BingBodyDec13_Top100KWords.txt")
 
 def tfs(words):
     """
@@ -33,9 +33,6 @@ def tfs(words):
             ret[word] += 1
         else:
             ret[word] = 1
-
-    for key, value in ret.items():
-        ret[key] = log(1 / value)
 
     return ret
 
@@ -54,7 +51,7 @@ def words(sentence):
         Tokenizes a sentence.
         Returns a list of lowercase words containing no punctuation.
     """
-    return sentence.translate(string.maketrans("", ""), string.punctuation).lower().split()
+    return "".join(e for e in sentence if e not in string.punctuation).lower().split()
 
 def csim(tfidfs, a, b):
     """
@@ -74,21 +71,27 @@ def csim(tfidfs, a, b):
         alen += tfidfs[word] * tfidfs[word] if (word in a) else 0
         blen += tfidfs[word] * tfidfs[word] if (word in b) else 0
 
-    return dot / (math.sqrt(alen) * math.sqrt(blen))
-        
+    norm = math.sqrt(alen) * math.sqrt(blen)
 
-def centralities(sentences):
-    words = [words(s) for s in sentences]
-    freqs = tfs(words)
+    return dot / norm if norm > 0 else 0
+
+def centrality_scores(sentences):
+    word_lists = [words(s) for s in sentences]
+    freqs = tfs([i for l in word_lists for i in l]) # flatten word list
     tfidfs = { }
 
-    for w in words:
-        tfidfs[w] = freqs[w] * idfs[w]
+    for w in freqs.keys():
+        tfidfs[w] = freqs[w] * (idfs[w] if w in idfs else 1)
 
-    for i in range(len()):
-        for j in range(i + 1, len(words)):
-            pass
-            # TODO
+    incidence = [[0 for i in range(len(word_lists))] for j in range(len(word_lists))]
+
+    for i in range(len(word_lists)):
+        for j in range(i + 1, len(word_lists)):
+            incidence[i][j] = incidence[j][i] = csim(tfidfs, word_lists[i], word_lists[j])
+
+    return incidence
+
+print(centrality_scores(["the dog", "the cat", "the dog and the cat"]))
 
 
 def title_score(sentence, title):
