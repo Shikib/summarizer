@@ -10,16 +10,20 @@
 		<div class="card blue-grey darken-1">
 			<div class="card-content white-text">
 				<span class="card-title">{{ topic.title }}</span>
-						{% for summary in topic.summary_set.all %}
-	<!-- 					<div class="divider"></div> -->
-						<div class="section">
-						{{ summary.text }}
-					</div>
-						{% endfor %}
-					<a class="waves-effect waves-light btn">Suscribe</a>
 			</div>
 		</div>
 	</div>
+	{% for summary in topic.summary_set.all %}
+	<div class="col s12">
+		<div class="card blue-grey darken-1">
+			<div class="card-content white-text">
+              <span  class="card-title">
+              	<a href= "{{ summary.url }}" >{{summary.title}}</a></span>
+              <p>{{ summary.text }}</p>
+            </div>
+		</div>
+	</div>
+	{% endfor %}
 </div>
 
 </div>
