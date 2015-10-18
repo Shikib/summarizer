@@ -39,15 +39,14 @@
 	{% cycle 'row' '' as row silent %}
 	{% if row %}<div class="row">{% endif %}
 	<div class="col s6">
-		<div class="card blue-grey darken-1">
-			<div class="card-content white-text">
-				<span class="card-title">{{ topic.title }}</span>
+		<div class="card  indigo lighten-4">
+			<div class="card-content grey-text text-darken-2">
+				<span class="card-title grey-text text-darken-4">{{ topic.title }}</span>
 				<p>Pietistic skinless sociologistically ribaldly nonvibrating runlet mismated osmidrosis hairball scarabaeid unpillaged friendship enghien outdone.</p>
 			</div>
-			<div class="card-action">
-				<a href="{% url 'detail' topic.id %}">View Summary</a>
+			<div class="card-action "><a href="{% url 'detail' topic.id %}" class="blue-text text-darken-4">View Summary</a>
 				{% if user.is_authenticated %}
-				<a class="waves-effect waves-light btn " href="{% url 'subscribe' topic.id %}"><i class="material-icons left">done</i>Suscribe</a>
+				<a class="waves-effect waves-light btn blue darken-2 white-text" href="{% url 'subscribe' topic.id %}"><i class="material-icons left">done</i>Suscribe</a>
 				{% endif %}
 			</div>
 		</div>
