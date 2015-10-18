@@ -11,6 +11,9 @@ from .forms import UserForm, UserProfileForm, TopicForm
 
 from .models import Topic, UserProfile
 
+import requests
+
+MAX_ARTICLES = 25
 
 # Create your views here.
 
@@ -30,6 +33,13 @@ def get_topics(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
+            topic = form.cleaned_data['topic']
+
+            r = requests.get('https://access.alchemyapi.com/calls/data/GetNews?apikey=0a7dcbd120fef17c8633df120ed697bb5962f300&return=enriched.url.url&start=now-7d&end=now&q.enriched.url.cleanedTitle=' + topic + '&count=25&outputMode=json')
+            jason = r.json()
+            
+
+
             return HttpResponseRedirect('/thanks/')
 
     # if a GET (or any other method) we'll create a blank form
