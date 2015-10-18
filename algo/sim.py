@@ -1,5 +1,9 @@
 import math
 
+pos_scores = [0.17, 0.23, 0.14, 0.08, 0.05, 0.04, 0.06, 0.04, 0.04, 0.15, 0]
+epsilon = 1e-10
+
+
 def import_idfs(filename):
     """
         Imports a dictionary of IDFs from a list of words sorted by inverse frequency.
@@ -86,9 +90,6 @@ def centralities(sentences):
             pass
             # TODO
 
-pos_scores = [0.17, 0.23, 0.14, 0.08, 0.05, 0.04, 0.06, 0.04, 0.04, 0.15, 0]
-epsilon = 1e-10
-
 
 def title_score(sentence, title):
     return csim(words(sentence), (title))
@@ -146,3 +147,22 @@ def relevance_scores(sentences, title, keywords):
         s = sentences[i]
         scores[s] = relevance_sentence_score(s, title, keywords, i, len(sentences))
     return scores
+
+def sentences_scores(sentences, title, keywords):
+    rscores = relevance_scores(sentences, title, keywords)
+    cscores = centrality_scores(sentences)
+    scores = {}
+    for s in sentences:
+        scores[s] = math.sqrt(rscores[s]*cscores[s])
+    return scores    
+
+def quick_select(sentences, k):
+    return []
+
+def summarize(sentences, title, keywords, summary_size):
+    scores = sentences_scores(sentences, title, keywords)
+    return quick_select(sentences, summary_size)
+
+
+
+
