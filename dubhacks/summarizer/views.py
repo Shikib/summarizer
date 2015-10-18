@@ -57,16 +57,14 @@ def get_topics(request):
             keywords = summarizer.data.get_keywords(topic)
             print(keywords)
 
-            """
             best_words = summarizer.data.best_keywords(keywords)
             keyword_scores = summarizer.data.keyword_scores(topic, best_words)
             urls = summarizer.data.get_urls(best_words)
 
             print('got urls!')
-            for link in urls:
+            for link in urls[:min(5, len(urls))]:
                 url = link['link']
                 # try:
-                print("tring url", url)
                 a = Article(url)
                 a.download()
 
@@ -89,7 +87,6 @@ def get_topics(request):
                 # except:
                 #     print ("exception")
                 #     pass
-                """
 
 
             #### NYT api call ####
@@ -110,8 +107,7 @@ def get_topics(request):
             #         result_list.append(url)
 
             twit_results = get_tweets(topic)
-            # result_list = urls
-            result_list = [] # temp
+            result_list = urls
 
             return render(request, 'summarizer/index.html', \
                     { 'twitter_results': twit_results if len(twit_results) > 0 else None,
