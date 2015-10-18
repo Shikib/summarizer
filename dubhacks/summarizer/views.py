@@ -49,9 +49,15 @@ def get_topics(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
+            topic = form.cleaned_data['search'].lower()
+            
 
-            topic = form.cleaned_data['search']
-            t = Topic(title=topic)
+            valid_topics = Topic.objects.filter(title=topic, updated=datetime.datetime.today())
+            print(valid_topics)
+            if valid_topics:
+                return detail(request, valid_topics[0].pk)
+           
+            t = Topic(title=topic, updated=datetime.datetime.today())
             t.save()
             print(topic)
             print("dfq")
@@ -91,7 +97,7 @@ def get_topics(request):
                 #     print ("exception")
                 #     pass
 
-
+            return detail(request, t.pk)
             #### NYT api call ####
 
             # for word in rand_keywords:
@@ -109,9 +115,6 @@ def get_topics(request):
             #         print ("================= \n ================= \n")
             #         result_list.append(url)
 
-
-
-            return render(request, 'summarizer/index.html', {'result_list': urls})
 
 
     # if a GET (or any other method) we'll create a blank form
