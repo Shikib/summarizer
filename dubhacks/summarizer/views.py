@@ -14,6 +14,7 @@ from .models import Topic, UserProfile
 from .bing_search import run_query
 from newspaper import Article
 import random
+import summarizer.data
 
 # from alchemyapi import AlchemyAPI
 # alchemyapi = AlchemyAPI()
@@ -31,32 +32,12 @@ def index(request):
 	context = {'latest_topic_list': latest_topic_list}
 	return render(request, 'summarizer/index.html', context)
 
-def get_keywords(topic):
-    plcontinue = None
-    cont = True
-    keywords = []
 
-    try:
-        while cont:
-            r = requests.get("https://en.wikipedia.org/w/api.php?action=query&prop=links&format=json&titles=" + topic + \
-                    "&pllimit=500&redirects" + (("&plcontinue=" + plcontinue) if plcontinue else ""))
-
-            json = r.json()
-
-            for link in next(iter(json["query"]["pages"].values()))["links"]:
-                keywords.append(link["title"])
-
-            cont = "continue" in json
-            plcontinue = json["continue"]["plcontinue"] if "continue" in json else None
-
-        return keywords
-    except:
-        return []
 
 def get_topics(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
+        # ceate a form instance and populate it with data from the request:
         form = TopicForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
@@ -65,61 +46,32 @@ def get_topics(request):
             # redirect to a new URL:
             topic = form.cleaned_data['topic']
 
-            keywords = get_keywords(topic)
-            rand_keywords = random.sample(keywords, min(10, len(keywords)))
-            graph = { }
+            keywords = summarizer.data.get_keywords(topic)
+            best_words = summarizer.data.best_keywords(keywords)
+            keyword_scores = summarizer.data.keyword_scores(topic, best_words)
+            urls_list = summarizer.data.get_urls(best_words)
+            summarizer.data.extract_text(urls_list)        
 
-            for curr_node in rand_keywords:
-                graph[curr_node] = []
-                for curr_neighbor in get_keywords(curr_node):
-                    if curr_neighbor in rand_keywords:
-                        graph[curr_node].append(curr_neighbor)
-
-            sorted_keys = sorted(graph, key=lambda x : len(graph[x]), reverse=True)
-
-            final_keywords = list(islice(sorted_keys, 5))
-            print(final_keywords)    
-
-            result_list = []
-
-            for word in final_keywords:
-                word = word.replace (" ", "+")
-                r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
-                json = r.json()
-                for i in json["response"]["docs"]:
-                    result_list.append(i['web_url'])
-
-            # result_list = []
-
-
-            # for word in rand_keywords:
-            #     word = word.replace (" ", "+")
-                
-            #     # r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
-            #     r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=body:'+ word + '&fl=web_url&api-key=' + KEY)
-            #     json = r.json()
-            #     for i in json["response"]["docs"]:
-            #         url = i['web_url']
-            #         a = Article(url)
-            #         a.download()
-            #         a.parse()
-            #         print (a.text, "\n")
-            #         print ("================= \n ================= \n")
-            #         result_list.append(url)
-
-            for word in rand_keywords:
-                links = run_query(word)
-                for i in links:
-                    url = i["link"]
-                    a = Article(url)
-                    a.download()
-                    a.parse()
-                    print (a.text, "\n")
-                    print ("================= \n================= \n")
-
-                result_list += links
-
-            return render(request, 'summarizer/index.html', {'result_list': result_list})
+#            result_list = []
+#            for word in final_keywords:
+#                word = word.replace (" ", "+")
+#                r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
+#                json = r.json()
+#                for i in json["response"]["docs"]:
+#                    result_list.append(i['web_url'])
+        
+#            for word in rand_keywords:
+#                links = run_query(word)
+#                for i in links:
+#                    url = i["link"]
+#                    a = Article(url)
+#                    a.download()
+#                    a.parse()
+#                    print (a.text, "\n")
+#                    print ("================= \n================= \n")
+#        
+#                result_list += links
+            return render(request, 'summarizer/index.html', {'result_list': urls_list})
 
     # if a GET (or any other method) we'll create a blank form
     else:

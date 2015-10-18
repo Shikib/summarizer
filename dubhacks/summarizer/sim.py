@@ -80,7 +80,7 @@ def import_idfs(filename):
 
     return ret
 
-idfs = import_idfs("../data/BingBodyDec13_Top100KWords.txt")
+idfs = import_idfs("dubhacks/summarizer/data-files/BingBodyDec13_Top100KWords.txt")
 
 def tfs(words):
     """
