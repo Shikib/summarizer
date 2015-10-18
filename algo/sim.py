@@ -62,17 +62,24 @@ def csim(tfidfs, a, b):
     union.update(a)
     union.update(b)
     
+    dot = 0
+    alen = 0
+    blen = 0
     for word in union:
-        # TODO
-        pass
+        dot += tfidfs[word] * tfidfs[word] if (word in a and word in b) else 0
+        alen += tfidfs[word] * tfidfs[word] if (word in a) else 0
+        blen += tfidfs[word] * tfidfs[word] if (word in b) else 0
+
+    return dot / (math.sqrt(alen) * math.sqrt(blen))
+        
 
 def centralities(sentences):
     words = [words(s) for s in sentences]
     freqs = tfs(words)
-    tfidfs = {}
+    tfidfs = { }
 
     for w in words:
-        tfidfs[w] = freqs[w] * ifreqs[w]
+        tfidfs[w] = freqs[w] * idfs[w]
 
     for i in range(len()):
         for j in range(i + 1, len(words)):
