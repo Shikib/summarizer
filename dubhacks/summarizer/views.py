@@ -12,9 +12,8 @@ from .forms import UserForm, UserProfileForm, TopicForm
 
 from .models import Topic, UserProfile
 from .bing_search import run_query
-import random
 from newspaper import Article
-num_rel_init = 10
+import random
 
 # from alchemyapi import AlchemyAPI
 # alchemyapi = AlchemyAPI()
@@ -37,19 +36,22 @@ def get_keywords(topic):
     cont = True
     keywords = []
 
-    while cont:
-        r = requests.get("https://en.wikipedia.org/w/api.php?action=query&prop=links&format=json&titles=" + topic + \
-                "&pllimit=500&redirects" + (("&plcontinue=" + plcontinue) if plcontinue else ""))
+    try:
+        while cont:
+            r = requests.get("https://en.wikipedia.org/w/api.php?action=query&prop=links&format=json&titles=" + topic + \
+                    "&pllimit=500&redirects" + (("&plcontinue=" + plcontinue) if plcontinue else ""))
 
-        json = r.json()
+            json = r.json()
 
-        for link in next(iter(json["query"]["pages"].values()))["links"]:
-            keywords.append(link["title"])
+            for link in next(iter(json["query"]["pages"].values()))["links"]:
+                keywords.append(link["title"])
 
-        cont = "continue" in json
-        plcontinue = json["continue"]["plcontinue"] if "continue" in json else None
+            cont = "continue" in json
+            plcontinue = json["continue"]["plcontinue"] if "continue" in json else None
 
-    return keywords
+        return keywords
+    except:
+        return []
 
 def get_topics(request):
     # if this is a POST request we need to process the form data
@@ -63,7 +65,8 @@ def get_topics(request):
             # redirect to a new URL:
             topic = form.cleaned_data['topic']
 
-            rand_keywords = random.sample(get_keywords(topic), num_rel_init)
+            keywords = get_keywords(topic)
+            rand_keywords = random.sample(keywords, min(10, len(keywords)))
             graph = { }
 
             for curr_node in rand_keywords:
