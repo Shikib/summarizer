@@ -14,3 +14,6 @@ class UserProfileForm(forms.ModelForm):
         model = UserProfile
         fields=()
         # fields = ('website', 'picture')
+
+class TopicForm(forms.Form):
+    topic = forms.CharField(label='topic', max_length=100)

@@ -5,6 +5,12 @@
 {% block content %}
 
 <div class="container">
+	<form action="/summarizer/your-name/" method="post">
+	{% csrf_token %}
+    <label for="topic">Topic: </label>
+    <input id="topic" type="text" name="topic" value="">
+    <input type="submit" value="OK">
+	</form>
 	{% if latest_topic_list %}
 	{% for topic in latest_topic_list %}
 	{% cycle 'row' '' as row silent %}

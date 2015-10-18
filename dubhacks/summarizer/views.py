@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 
-from .forms import UserForm, UserProfileForm
+from .forms import UserForm, UserProfileForm, TopicForm
 
 from .models import Topic, UserProfile
 
@@ -19,6 +19,24 @@ def index(request):
 
 	context = {'latest_topic_list': latest_topic_list}
 	return render(request, 'summarizer/index.html', context)
+
+def get_topics(request):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = TopicForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            return HttpResponseRedirect('/thanks/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = TopicForm()
+
+    return render(request, 'name.html', {'form': form})
 
 @login_required(login_url='/summarizer/login')
 def subscriptions(request):
@@ -39,7 +57,6 @@ def detail(request, topic_id):
 	except Topic.DoesNotExist:
 		raise Http404("Topic does not exist")
 	return render(request, 'summarizer/detail.html', {'topic': topic})
-
 
 
 def register(request):
