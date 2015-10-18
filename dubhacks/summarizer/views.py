@@ -11,6 +11,7 @@ from .forms import UserForm, UserProfileForm, TopicForm
 
 from .models import Topic, UserProfile
 from .bing_search import run_query
+import random
 
 # from alchemyapi import AlchemyAPI
 # alchemyapi = AlchemyAPI()
@@ -18,7 +19,7 @@ from .bing_search import run_query
 import requests
 
 MAX_ARTICLES = 25
-KEY = 'c3cae88e75e66a763221b9a85b325e9c91d1decc'
+KEY = '745df69626f8ab2cdcc2c783f2cf5038:18:73241801'
 
 # Create your views here.
 
@@ -58,8 +59,23 @@ def get_topics(request):
 
             print(keywords)
 
-            result_list = run_query(topic)
-            print (result_list)
+            rand_keywords = random.sample(keywords, 10)
+            print(rand_keywords)
+
+            result_list = []
+
+            for word in rand_keywords:
+                word = word.replace (" ", "+")
+                r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
+                json = r.json()
+                for i in json["response"]["docs"]:
+                    result_list.append(i['web_url'])
+
+            # result_list = []
+
+            # for word in rand_keywords:
+            #     l = run_query(word)
+            #     result_list += l
 
             return render(request, 'summarizer/index.html', {'result_list': result_list})
 
