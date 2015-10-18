@@ -232,12 +232,16 @@ def relevance_sentence_score(sentence, title, keywords, pos, sentence_count):
         0.1*length_score(sentence) + 0.25*position_score(pos, sentence_count)
     if not len(keywords):
         return score / 0.6
+    else:
+        return score
 
 def relevance_scores(sentences, title, keywords):
     scores = {}
+
     for i in range(0, len(sentences)):
         s = sentences[i]
         scores[s] = relevance_sentence_score(s, title, keywords, i, len(sentences))
+
     return scores
 
 def scale(cscores, rscores):
@@ -250,6 +254,7 @@ def scale(cscores, rscores):
 
 def sentences_scores(sentences, title, keywords):
     rscores = relevance_scores(sentences, title, keywords)
+
     cscores, sim_matrix = centrality_scores(sentences)
     csores = scale(cscores, rscores)
 
