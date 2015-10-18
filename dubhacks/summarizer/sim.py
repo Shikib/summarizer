@@ -228,8 +228,10 @@ def position_score(pos, sentence_count):
     return pos_scores[math.floor(normalize_pos*10)]
 
 def relevance_sentence_score(sentence, title, keywords, pos, sentence_count):
-    return 0.25*title_score(sentence, title) + 0.4*keyword_score(sentence, keywords) + \
+    score = 0.25*title_score(sentence, title) + 0.4*keyword_score(sentence, keywords) + \
         0.1*length_score(sentence) + 0.25*position_score(pos, sentence_count)
+    if not len(keywords):
+        return score / 0.6
 
 def relevance_scores(sentences, title, keywords):
     scores = {}

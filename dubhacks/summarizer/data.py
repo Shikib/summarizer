@@ -15,7 +15,11 @@ def get_urls(best_words):
 
 def get_wiki(topic):
     url = "http://en.wikipedia.org/wiki/" + topic
-    response = urlopen(url)
+    try:
+        response = urlopen(url)
+    except:
+        return []
+ 
     data = response.read()
     text = data.decode('utf-8')
     return text.lower()
