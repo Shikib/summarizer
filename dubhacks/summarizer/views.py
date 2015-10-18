@@ -18,6 +18,7 @@ import summarizer.data
 import summarizer.sim
 import re
 from django.utils import timezone
+from django.shortcuts import redirect
 
 num_rel_init = 10
 
@@ -78,7 +79,9 @@ def get_topics(request):
                 print("starting summary")
                 summary = summarizer.sim.summarize(lines, a.title, keyword_scores, 3) 
 
-                s = Summary(title=a.title, text=summary[0], url=url, date=timezone.now())
+                title = a.title
+
+                s = Summary(title=title.title(), text=summary[0], url=url, date=timezone.now())
                 s.save()
                 t.summary_set.add(s)
 
@@ -146,7 +149,25 @@ def subscribe(request, topic_id):
  #    })
     # return HttpResponse(template.render(context))
     # context = {'subscription_list': subscription_list}
-    return HttpResponse("Subscribed!")
+    return  redirect('/summarizer/subscriptions')
+
+@login_required(login_url='/summarizer/login')
+def unsubscribe(request, topic_id):
+    user = request.user
+    try:
+        topic = Topic.objects.get(pk=topic_id)
+    except Topic.DoesNotExist:
+        raise Http404("Topic does not exist")
+    userprofile = UserProfile.objects.get(user=user)
+    userprofile.topic_set.remove(topic)
+
+    # template = loader.get_template('dubhacks/index.html')
+    # context = RequestContext(request, {
+ #        'latest_topic_list': latest_topic_list,
+ #    })
+    # return HttpResponse(template.render(context))
+    # context = {'subscription_list': subscription_list}
+    return  redirect('/summarizer/subscriptions')
 
 def detail(request, topic_id):
 	try:
@@ -238,7 +259,7 @@ def user_login(request):
                 # If the account is valid and active, we can log the user in.
                 # We'll send the user back to the homepage.
                 login(request, user)
-                return HttpResponseRedirect('/summarizer/')
+                return HttpResponseRedirect('/summarizer/subscriptions/')
             else:
                 # An inactive account was used - no logging in!
                 return HttpResponse("Your account is disabled.")
