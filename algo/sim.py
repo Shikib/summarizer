@@ -21,7 +21,7 @@ def import_idfs(filename):
 
     return ret
 
-idfs = import_idfs("data/BingBodyDec13_Top100KWords.txt")
+idfs = import_idfs("../data/BingBodyDec13_Top100KWords.txt")
 
 def tfs(words):
     """
@@ -83,11 +83,14 @@ def centrality_scores(sentences):
     for w in freqs.keys():
         tfidfs[w] = freqs[w] * (idfs[w] if w in idfs else 1)
 
-    incidence = [[0 for i in range(len(word_lists))] for j in range(len(word_lists))]
+    #incidence = [[0 for i in range(len(word_lists))] for j in range(len(word_lists))]
+    incidence = {}
 
-    for i in range(len(word_lists)):
-        for j in range(i + 1, len(word_lists)):
-            incidence[i][j] = incidence[j][i] = csim(tfidfs, word_lists[i], word_lists[j])
+    for s1 in sentences:
+        incidence[s1] = {}
+        for s2 in sentences:
+            #incidence[i][j] = incidence[j][i] = csim(tfidfs, word_lists[i], word_lists[j])
+            incidence[s1][s2] = csim(tfidfs, words(s1), words(s2))
 
     return incidence
 
@@ -180,7 +183,7 @@ def quick_select(scores, k):
 def select_best(scores, k):
     kth_best = quick_select(scores.values(), k)
     sentences = []
-    for s in scores.keys()
+    for s in scores.keys():
         if scores[s] >= kth_best:
             sentences.append(s)
 
