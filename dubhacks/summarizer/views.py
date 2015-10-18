@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 
 from .forms import UserForm, UserProfileForm, TopicForm
 
@@ -28,8 +29,6 @@ num_rel_init = 10
 
 import requests
 
-MAX_ARTICLES = 25
-KEY = '745df69626f8ab2cdcc2c783f2cf5038:18:73241801'
 
 # Create your views here.
 
@@ -52,12 +51,16 @@ def get_topics(request):
             topic = form.cleaned_data['search'].lower()
             
 
-            valid_topics = Topic.objects.filter(title=topic, updated=datetime.datetime.today())
+            valid_topics = Topic.objects.filter(title=topic, updated__day=timezone.now().day)
+
             print(valid_topics)
+            print(timezone.now().day)
             if valid_topics:
-                return detail(request, valid_topics[0].pk)
+                return HttpResponseRedirect(reverse('detail', args=[valid_topics[0].pk]))
+
+            Topic.objects.filter(title=topic).delete()
            
-            t = Topic(title=topic, updated=datetime.datetime.today())
+            t = Topic(title=topic, updated=timezone.now())
             t.save()
             print(topic)
             print("dfq")
@@ -87,7 +90,7 @@ def get_topics(request):
 
                 title = a.title
 
-                s = Summary(title=title.title(), text=summary[0], url=url, date=timezone.now())
+                s = Summary(title=title.title(), text=summary[0], url=url)
                 s.save()
                 t.summary_set.add(s)
 

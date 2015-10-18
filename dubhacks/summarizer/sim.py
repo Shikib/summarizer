@@ -313,6 +313,8 @@ def summarize(sentences, title, keywords, summary_size):
         return sentences
 
     print ("in summary!")
+    print ("titles: ", title)
+    print ("keywords", keywords)
     scores, sim_matrix = sentences_scores(sentences, title, keywords)
     print("scentences!")
    

@@ -11,9 +11,11 @@ class UserProfile(models.Model):
 class Topic(models.Model):
     title = models.CharField(max_length=200)
     subscribers = models.ManyToManyField(UserProfile)
-    updated = models.DateField()
+    updated = models.DateField(blank=True, null=True)
     def __str__(self):
         return self.title
+    def was_updated_today(self):
+        return self.updated >= timezone.now() - datetime.timedelta(days=1)
 
 class Summary(models.Model):
     title = models.TextField(blank=True)
