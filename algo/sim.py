@@ -1,4 +1,4 @@
-import math
+import math, string
 
 import numpy as np
 from scipy.sparse import csc_matrix
@@ -73,7 +73,7 @@ def import_idfs(filename):
     """
     ret = { }
     with open(filename) as f:
-        i = 0
+        i = 1
         for line in f.readlines():
             # Discard newline
             ret[line[:-1]] = i
@@ -97,9 +97,6 @@ def tfs(words):
         else:
             ret[word] = 1
 
-    for key, value in ret.items():
-        ret[key] = log(1 / value)
-
     return ret
 
 def normalize(dd):
@@ -117,7 +114,7 @@ def words(sentence):
         Tokenizes a sentence.
         Returns a list of lowercase words containing no punctuation.
     """
-    return sentence.translate(string.maketrans("", ""), string.punctuation).lower().split()
+    return "".join(e for e in sentence if e not in string.punctuation).lower().split()
 
 def csim(tfidfs, a, b):
     """
@@ -137,21 +134,30 @@ def csim(tfidfs, a, b):
         alen += tfidfs[word] * tfidfs[word] if (word in a) else 0
         blen += tfidfs[word] * tfidfs[word] if (word in b) else 0
 
-    return dot / (math.sqrt(alen) * math.sqrt(blen))
-        
+    norm = math.sqrt(alen) * math.sqrt(blen)
 
-def centralities(sentences):
-    words = [words(s) for s in sentences]
-    freqs = tfs(words)
+    return dot / norm if norm > 0 else 0
+
+def centrality_scores(sentences):
+    word_lists = [words(s) for s in sentences]
+    freqs = tfs([i for l in word_lists for i in l]) # flatten word list
     tfidfs = { }
 
-    for w in words:
-        tfidfs[w] = freqs[w] * idfs[w]
+    for w in freqs.keys():
+        tfidfs[w] = freqs[w] * (idfs[w] if w in idfs else 1)
 
-    for i in range(len()):
-        for j in range(i + 1, len(words)):
-            pass
-            # TODO
+    #incidence = [[0 for i in range(len(word_lists))] for j in range(len(word_lists))]
+    incidence = {}
+
+    for s1 in sentences:
+        incidence[s1] = {}
+        for s2 in sentences:
+            #incidence[i][j] = incidence[j][i] = csim(tfidfs, word_lists[i], word_lists[j])
+            incidence[s1][s2] = csim(tfidfs, words(s1), words(s2))
+
+    return incidence
+
+print(centrality_scores(["the dog", "the cat", "the dog and the cat"]))
 
 
 def title_score(sentence, title):
@@ -213,18 +219,71 @@ def relevance_scores(sentences, title, keywords):
 
 def sentences_scores(sentences, title, keywords):
     rscores = relevance_scores(sentences, title, keywords)
-    cscores = centrality_scores(sentences)
+    cscores, sim_matrix = centrality_scores(sentences)
     scores = {}
     for s in sentences:
         scores[s] = math.sqrt(rscores[s]*cscores[s])
-    return scores    
+    return scores, sim_matrix
 
-def quick_select(sentences, k):
-    return []
+# find score of k-th best sentence
+# looks at [start, end)
+def quick_select(scores, k):
+    pivot = sentences[0]
+    left = []
+    right = []
+    for score in scores:
+        if score < pivot:
+            left.append(score)
+        else:
+            right.append(score)
+    if k < len(left):
+        return quick_select(left, k)
+    elif k > len(left):
+        return quick_select(right, k - len(left))
+    else:
+        return pivot
 
+def select_best(scores, k):
+    kth_best = quick_select(scores.values(), k)
+    sentences = []
+    for s in scores.keys():
+        if scores[s] >= kth_best:
+            sentences.append(s)
+
+    return sentences
+    
+def maximal_similarity(s, summary_sentences, sim_matrix):
+    maximal = 0.0
+    for s2 in summary_sentneces:
+        maximal = max(maximal, sim_matrix[s][s2])
+
+    return maximal
+
+def maximal_marginal_relevance(scores, sorted_sentences, summary_sentences, sim_matrix):   
+    lambd = 0.6
+    max_score = 0.0
+    max_sent = None
+    for s in sorted_sentences:
+        score = lambd*scores[s] - (1-lambd)*maximal_similarity(s, summary_sentences, sim_matrix)
+        if score > max_score:
+            max_score = score
+            max_sent = s
+
+    del sorted_sentences[max_sent]
+    return max_sent
+      
 def summarize(sentences, title, keywords, summary_size):
-    scores = sentences_scores(sentences, title, keywords)
-    return quick_select(sentences, summary_size)
+    scores, sim_matrix = sentences_scores(sentences, title, keywords)
+    sentences = select_best(sentences, summary_size*2)
+   
+    sorted_sentences = sorted(sentences, key=lambda s: scores[s], reverse=True) 
+    
+    sum_sentences = []
+    for i in range(0, summary_size):
+        sum_sentences.append(scores, sorted_sentences, summary_sentences, sim_matrix)
+
+    return sum_sentences
+    
 
 
 
