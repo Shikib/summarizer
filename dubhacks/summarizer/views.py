@@ -61,7 +61,7 @@ def get_topics(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            topic = form.cleaned_data['topic']
+            topic = form.cleaned_data['search']
 
             rand_keywords = random.sample(get_keywords(topic), num_rel_init)
             graph = { }
@@ -79,12 +79,12 @@ def get_topics(request):
 
             result_list = []
 
-            for word in final_keywords:
-                word = word.replace (" ", "+")
-                r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
-                json = r.json()
-                for i in json["response"]["docs"]:
-                    result_list.append(i['web_url'])
+            # for word in final_keywords:
+            #     word = word.replace (" ", "+")
+            #     r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
+            #     json = r.json()
+            #     for i in json["response"]["docs"]:
+            #         result_list.append(i['web_url'])
 
             # result_list = []
 
