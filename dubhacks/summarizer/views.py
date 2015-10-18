@@ -88,9 +88,9 @@ def get_topics(request):
                     a.download()
                     a.parse()
                     print (a.text, "\n")
-                    print ("================= \n ================= \n")
+                    print ("================= \n================= \n")
 
-                result_list += i
+                result_list += links
 
             return render(request, 'summarizer/index.html', {'result_list': result_list})
 
