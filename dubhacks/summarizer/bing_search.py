@@ -56,6 +56,7 @@ def run_query(search_terms):
         # Loop through each page returned, populating out results list.
         for result in json_response['d']['results']:
             results.append({
+                'title': result['Title'],
                 'link': result['Url']})
 
     # Catch a URLError exception - something went wrong when connecting!

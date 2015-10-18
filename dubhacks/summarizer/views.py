@@ -40,18 +40,24 @@ def get_topics(request):
             # redirect to a new URL:
             topic = form.cleaned_data['topic']
 
-            # r = requests.get('https://gateway-a.watsonplatform.net/calls/data/GetNews?apikey=' + KEY '&return=enriched.url.url&start=now-7d&end=now&q.enriched.url.cleanedTitle=' + topic + '&count=5&outputMode=json')
-            # jason = r.json()
+            plcontinue = None
+            cont = True
+            keywords = []
 
-            # url_good = []
+            while cont:
+                r = requests.get("https://en.wikipedia.org/w/api.php?action=query&prop=links&format=json&titles=" + topic + \
+                        "&pllimit=500&redirects" + (("&plcontinue=" + plcontinue) if plcontinue else ""))
 
-            # for url in urls_rel:
-            #     response = alchemyapi.keywords('url', url, {})
-            #     if response['status'] == 'OK':
-            #         keywords = response['keywords']
-            #         for word in keywords:
-            #             if word['text'] == topic and float(word['relevance']) >= 0.8:
-            #                 url_good.append(url)
+                json = r.json()
+
+                for link in next(iter(json["query"]["pages"].values()))["links"]:
+                    keywords.append(link["title"])
+
+                cont = "continue" in json
+                plcontinue = json["continue"]["plcontinue"] if "continue" in json else None
+
+            print(keywords)
+
             result_list = run_query(topic)
             print (result_list)
 
