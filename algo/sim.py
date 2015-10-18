@@ -155,7 +155,7 @@ def centrality_scores(sentences):
             incidence[s1][s2] = csim(tfidfs, words(s1), words(s2))
            
     
-    print(incidence)
+    # print(incidence)
     pagerank_scores = page_rank(matrix)
 
     scores = {}
@@ -175,7 +175,7 @@ def title_score(sentence, title):
     for w in freqs.keys():
         tfidfs[w] = freqs[w] * (idfs[w] if w in idfs else 1)
 
-    print(csim(tfidfs, words(sentence), words(title)))
+    # print(csim(tfidfs, words(sentence), words(title)))
     return csim(tfidfs, words(sentence), words(title))
    
 

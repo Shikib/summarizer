@@ -13,6 +13,7 @@ from .forms import UserForm, UserProfileForm, TopicForm
 
 from .models import Topic, UserProfile, Summary
 from .bing_search import run_query
+from .twit_search import get_tweets
 from newspaper import Article
 import random
 import summarizer.data
@@ -33,10 +34,9 @@ import requests
 # Create your views here.
 
 def index(request):
-	latest_topic_list = Topic.objects.order_by('-title')
-
-	context = {'latest_topic_list': latest_topic_list}
-	return render(request, 'summarizer/index.html', context)
+    latest_topic_list = Topic.objects.order_by('-title')
+    context = {'latest_topic_list': latest_topic_list}
+    return render(request, 'summarizer/index.html', context)
 
 def get_topics(request):
     # if this is a POST request we need to process the form data
@@ -62,25 +62,27 @@ def get_topics(request):
            
             t = Topic(title=topic, updated=timezone.now())
             t.save()
-            print(topic)
-            print("dfq")
             keywords = summarizer.data.get_keywords(topic)
-            print(keywords)
-            best_words = summarizer.data.best_keywords(keywords)
-            keyword_scores = summarizer.data.keyword_scores(topic, best_words)
-            urls = summarizer.data.get_urls(best_words)
 
-            print('got urls!')
+            print(keywords)
+
+            best_words = summarizer.data.best_keywords(keywords)
+
+            keyword_scores = summarizer.data.keyword_scores(topic, best_words)
+            print("get urls")
+            urls = summarizer.data.get_urls(list(best_words)[:min(3, len(best_words))])
+
             for link in urls:
                 url = link['link']
+                print(url)
                 # try:
-                print("tring url", url)
                 a = Article(url)
                 a.download()
 
                 try:
                     a.parse()
                 except:
+                    print("broken article")
                     continue
 
                 text = a.text
@@ -94,7 +96,7 @@ def get_topics(request):
                 s.save()
                 t.summary_set.add(s)
 
-                print (summary, '\n')
+                # print (summary, '\n')
                 print ("==================\n")
                 # except:
                 #     print ("exception")
@@ -114,11 +116,9 @@ def get_topics(request):
             #         a = Article(url)
             #         a.download()
             #         a.parse()
-            #         print (a.text, "\n")
-            #         print ("================= \n ================= \n")
             #         result_list.append(url)
 
-
+            
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -128,16 +128,16 @@ def get_topics(request):
 
 @login_required(login_url='/summarizer/login')
 def subscriptions(request):
-	user = request.user
-	userprofile = UserProfile.objects.get(user=user)
-	subscription_list = userprofile.topic_set.all()
-	# template = loader.get_template('dubhacks/index.html')
-	# context = RequestContext(request, {
+    user = request.user
+    userprofile = UserProfile.objects.get(user=user)
+    subscription_list = userprofile.topic_set.all()
+    # template = loader.get_template('dubhacks/index.html')
+    # context = RequestContext(request, {
  #        'latest_topic_list': latest_topic_list,
  #    })
-	# return HttpResponse(template.render(context))
-	# context = {'subscription_list': subscription_list}
-	return render(request, 'summarizer/subscriptions.html', {'subscription_list': subscription_list})
+    # return HttpResponse(template.render(context))
+    # context = {'subscription_list': subscription_list}
+    return render(request, 'summarizer/subscriptions.html', {'subscription_list': subscription_list})
 
 @login_required(login_url='/summarizer/login')
 def subscribe(request, topic_id):
@@ -176,11 +176,18 @@ def unsubscribe(request, topic_id):
     return  redirect('/summarizer/subscriptions')
 
 def detail(request, topic_id):
-	try:
-		topic = Topic.objects.get(pk=topic_id)
-	except Topic.DoesNotExist:
-		raise Http404("Topic does not exist")
-	return render(request, 'summarizer/detail.html', {'topic': topic})
+    try:
+        topic = Topic.objects.get(pk=topic_id)
+    except Topic.DoesNotExist:
+        raise Http404("Topic does not exist")
+
+    twit_results = get_tweets(topic.title)
+    print (twit_results)
+
+    return render(request, 'summarizer/detail.html',
+            { 'twitter_results': twit_results if len(twit_results) > 0 else None,
+                'topic': topic})
+    # return render(request, 'summarizer/detail.html', {'topic': topic})
 
 
 def register(request):

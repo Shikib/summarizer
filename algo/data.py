@@ -25,7 +25,7 @@ def extract_text(links):
 		a = Article(url)
 		a.download()
 		a.parse()
-		print(a.text, "\n")
+		# print(a.text, "\n")
 		print('======================\n')
 
 
@@ -78,7 +78,6 @@ def keyword_scores(topic, best_keywords):
        idf = idfs[word] if word in idfs else 1 
        keyword_scores[word] = tf*idf
     return keyword_scores
-
 
 def get_topics(topic):
     keywords = get_keywords(topic)

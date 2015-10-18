@@ -154,7 +154,7 @@ def centrality_scores(sentences):
             incidence[s1][s2] = csim(tfidfs, words(s1), words(s2))
            
     
-    print(incidence)
+    # print(incidence)
     pagerank_scores = page_rank(matrix)
 
     scores = {}
@@ -174,7 +174,7 @@ def title_score(sentence, title):
     for w in freqs.keys():
         tfidfs[w] = freqs[w] * (idfs[w] if w in idfs else 1)
 
-    print(csim(tfidfs, words(sentence), words(title)))
+    # print(csim(tfidfs, words(sentence), words(title)))
     return csim(tfidfs, words(sentence), words(title))
    
 
@@ -232,12 +232,16 @@ def relevance_sentence_score(sentence, title, keywords, pos, sentence_count):
         0.1*length_score(sentence) + 0.25*position_score(pos, sentence_count)
     if not len(keywords):
         return score / 0.6
+    else:
+        return score
 
 def relevance_scores(sentences, title, keywords):
     scores = {}
+
     for i in range(0, len(sentences)):
         s = sentences[i]
         scores[s] = relevance_sentence_score(s, title, keywords, i, len(sentences))
+
     return scores
 
 def scale(cscores, rscores):
@@ -250,6 +254,7 @@ def scale(cscores, rscores):
 
 def sentences_scores(sentences, title, keywords):
     rscores = relevance_scores(sentences, title, keywords)
+
     cscores, sim_matrix = centrality_scores(sentences)
     csores = scale(cscores, rscores)
 

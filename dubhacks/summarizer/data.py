@@ -42,9 +42,7 @@ def get_keywords(topic):
         text = text[pos+7:]
         keyword = text[0:text.find('"')]
         if 'wikipedia' not in keyword and 'this article' not in keyword:
-            print("pls")
             keywords.append(keyword)
-            print(keyword)
             count += 1
         pos = text.find('title="')
   
@@ -79,5 +77,3 @@ def keyword_scores(topic, best_keywords):
 def get_topics(topic):
     keywords = get_keywords(topic)
     best_keywords = best_keywords(keywords)
-    
-

@@ -10,6 +10,9 @@
 		<div class="card indigo lighten-1">
 			<div class="card-content white-text">
 				<span class="card-title">{{ topic.title }}</span>
+				{% if user.is_authenticated %}
+				 <a class="waves-effect waves-light btn  pink accent-1 white-text right" href="{% url 'subscribe' topic.id %}" ><i class="material-icons left">done</i>Unsuscribe</a>
+				 {% endif %}
 			</div>
 		</div>
 	</div>
@@ -26,6 +29,17 @@
 	{% endfor %}
 </div>
 
+	{% if twitter_results %}
+	{% for tweet in twitter_results %}
+	{% cycle 'row' '' as row silent %}
+	{% if row %}<div class="row">{% endif %}
+	<div class="col s6">
+		<blockquote class="twitter-tweet" lang="en" data-cards="hidden"><a href={{ tweet }}></a></blockquote>
+	</div>
+	{% if not row %}</div>{% endif %}
+	{% endfor %}
+	{% endif %}
+
 </div>
     </body>
 
@@ -33,3 +47,4 @@
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>

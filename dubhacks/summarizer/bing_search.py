@@ -12,7 +12,7 @@ def run_query(search_terms):
     # Specify how many results we wish to be returned per page.
     # Offset specifies where in the results list to start from.
     # With results_per_page = 10 and offset = 11, this would start from page 2.
-    results_per_page = 10
+    results_per_page = 3
     offset = 0
 
     # Wrap quotes around our query terms as required by the Bing API.
@@ -20,7 +20,7 @@ def run_query(search_terms):
     query = "'{0}'".format(search_terms)
     query = urllib2.quote(query)
 
-    print (query)
+    print(query)
 
     # Construct the latter part of our request's URL.
     # Sets the format of the response to JSON and sets other properties.

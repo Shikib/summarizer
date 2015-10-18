@@ -19,21 +19,6 @@
 </div>
 	</form> -->
 
-	{% if result_list %}
-        <!-- Display search results in an ordered list -->
-        <div style="clear: both;">
-            <ol>
-            {% for result in result_list %}
-                <li>
-                    <strong>{{ result.link }}</strong><br />
-                    <em>{{ result.title }}</em>
-                </li>
-            {% endfor %}
-            </ol>
-        </div>
-    {% endif %}
-
-
 	{% if latest_topic_list %}
 	{% for topic in latest_topic_list %}
 	{% cycle 'row' '' as row silent %}
@@ -59,9 +44,9 @@
 			<span class="card-title">No Topics Avalible</span>
 		</div>
 	</div>
-	
-{% endif %}
-
+	{% endif %}
 </div>
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 {% endblock %}
