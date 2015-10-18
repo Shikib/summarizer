@@ -10,10 +10,15 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserForm, UserProfileForm, TopicForm
 
 from .models import Topic, UserProfile
+from .bing_search import run_query
+
+# from alchemyapi import AlchemyAPI
+# alchemyapi = AlchemyAPI()
 
 import requests
 
 MAX_ARTICLES = 25
+KEY = 'c3cae88e75e66a763221b9a85b325e9c91d1decc'
 
 # Create your views here.
 
@@ -35,12 +40,22 @@ def get_topics(request):
             # redirect to a new URL:
             topic = form.cleaned_data['topic']
 
-            r = requests.get('https://access.alchemyapi.com/calls/data/GetNews?apikey=0a7dcbd120fef17c8633df120ed697bb5962f300&return=enriched.url.url&start=now-7d&end=now&q.enriched.url.cleanedTitle=' + topic + '&count=25&outputMode=json')
-            jason = r.json()
-            
+            # r = requests.get('https://gateway-a.watsonplatform.net/calls/data/GetNews?apikey=' + KEY '&return=enriched.url.url&start=now-7d&end=now&q.enriched.url.cleanedTitle=' + topic + '&count=5&outputMode=json')
+            # jason = r.json()
 
+            # url_good = []
 
-            return HttpResponseRedirect('/thanks/')
+            # for url in urls_rel:
+            #     response = alchemyapi.keywords('url', url, {})
+            #     if response['status'] == 'OK':
+            #         keywords = response['keywords']
+            #         for word in keywords:
+            #             if word['text'] == topic and float(word['relevance']) >= 0.8:
+            #                 url_good.append(url)
+            result_list = run_query(topic)
+            print (result_list)
+
+            return render(request, 'summarizer/index.html', {'result_list': result_list})
 
     # if a GET (or any other method) we'll create a blank form
     else:

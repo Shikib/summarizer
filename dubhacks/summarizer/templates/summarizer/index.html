@@ -11,6 +11,22 @@
     <input id="topic" type="text" name="topic" value="">
     <input type="submit" value="OK">
 	</form>
+
+	{% if result_list %}
+        <!-- Display search results in an ordered list -->
+        <div style="clear: both;">
+            <ol>
+            {% for result in result_list %}
+                <li>
+                    <strong>{{ result.link }}</strong><br />
+                    <em>{{ result.summary }}</em>
+                </li>
+            {% endfor %}
+            </ol>
+        </div>
+    {% endif %}
+
+
 	{% if latest_topic_list %}
 	{% for topic in latest_topic_list %}
 	{% cycle 'row' '' as row silent %}
