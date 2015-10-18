@@ -25,7 +25,7 @@ def extract_text(links):
 		a = Article(url)
 		a.download()
 		a.parse()
-		print(a.text, "\n")
+		# print(a.text, "\n")
 		print('======================\n')
 
 

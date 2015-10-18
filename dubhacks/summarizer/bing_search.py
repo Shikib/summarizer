@@ -20,7 +20,7 @@ def run_query(search_terms):
     query = "'{0}'".format(search_terms)
     query = urllib2.quote(query)
 
-    print (query)
+    print(query)
 
     # Construct the latter part of our request's URL.
     # Sets the format of the response to JSON and sets other properties.

@@ -52,18 +52,19 @@ def get_topics(request):
             topic = form.cleaned_data['search']
             t = Topic(title=topic)
             t.save()
-            print(topic)
-            print("dfq")
             keywords = summarizer.data.get_keywords(topic)
+
             print(keywords)
 
             best_words = summarizer.data.best_keywords(keywords)
-            keyword_scores = summarizer.data.keyword_scores(topic, best_words)
-            urls = summarizer.data.get_urls(best_words)
 
-            print('got urls!')
-            for link in urls[:min(5, len(urls))]:
+            keyword_scores = summarizer.data.keyword_scores(topic, best_words)
+            print("get urls")
+            urls = summarizer.data.get_urls(list(best_words)[:min(15, len(best_words))])
+
+            for link in urls:
                 url = link['link']
+                print(url)
                 # try:
                 a = Article(url)
                 a.download()
@@ -71,6 +72,7 @@ def get_topics(request):
                 try:
                     a.parse()
                 except:
+                    print("broken article")
                     continue
 
                 text = a.text
@@ -82,7 +84,7 @@ def get_topics(request):
                 s.save()
                 t.summary_set.add(s)
 
-                print (summary, '\n')
+                # print (summary, '\n')
                 print ("==================\n")
                 # except:
                 #     print ("exception")

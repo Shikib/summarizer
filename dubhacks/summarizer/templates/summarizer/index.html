@@ -19,7 +19,6 @@
 </div>
 	</form> -->
 
-<!--
 	{% if result_list %}
         <div style="clear: both;">
             <ol>
@@ -32,14 +31,13 @@
             </ol>
         </div>
     {% endif %}
--->
 
 	{% if twitter_results %}
 	{% for tweet in twitter_results %}
 	{% cycle 'row' '' as row silent %}
 	{% if row %}<div class="row">{% endif %}
 	<div class="col s6">
-		<blockquote class="twitter-tweet" lang="en"><a href={{ tweet }}></a></blockquote>
+		<blockquote class="twitter-tweet" lang="en" data-cards="hidden"><a href={{ tweet }}></a></blockquote>
 	</div>
 	{% if not row %}</div>{% endif %}
 	{% endfor %}
