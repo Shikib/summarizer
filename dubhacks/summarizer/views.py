@@ -12,6 +12,7 @@ from .forms import UserForm, UserProfileForm, TopicForm
 from .models import Topic, UserProfile
 from .bing_search import run_query
 import random
+from newspaper import Article
 
 # from alchemyapi import AlchemyAPI
 # alchemyapi = AlchemyAPI()
@@ -59,23 +60,37 @@ def get_topics(request):
 
             print(keywords)
 
-            rand_keywords = random.sample(keywords, 10)
+            rand_keywords = random.sample(keywords, 3)
             print(rand_keywords)
 
             result_list = []
 
-            for word in rand_keywords:
-                word = word.replace (" ", "+")
-                r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
-                json = r.json()
-                for i in json["response"]["docs"]:
-                    result_list.append(i['web_url'])
-
-            # result_list = []
-
             # for word in rand_keywords:
-            #     l = run_query(word)
-            #     result_list += l
+            #     word = word.replace (" ", "+")
+                
+            #     # r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
+            #     r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=body:'+ word + '&fl=web_url&api-key=' + KEY)
+            #     json = r.json()
+            #     for i in json["response"]["docs"]:
+            #         url = i['web_url']
+            #         a = Article(url)
+            #         a.download()
+            #         a.parse()
+            #         print (a.text, "\n")
+            #         print ("================= \n ================= \n")
+            #         result_list.append(url)
+
+            for word in rand_keywords:
+                links = run_query(word)
+                for i in links:
+                    url = i["link"]
+                    a = Article(url)
+                    a.download()
+                    a.parse()
+                    print (a.text, "\n")
+                    print ("================= \n ================= \n")
+
+                result_list += i
 
             return render(request, 'summarizer/index.html', {'result_list': result_list})
 
