@@ -12,6 +12,7 @@ from .forms import UserForm, UserProfileForm, TopicForm
 from .models import Topic, UserProfile
 from .bing_search import run_query
 import random
+num_rel_init = 20
 
 # from alchemyapi import AlchemyAPI
 # alchemyapi = AlchemyAPI()
@@ -29,6 +30,24 @@ def index(request):
 	context = {'latest_topic_list': latest_topic_list}
 	return render(request, 'summarizer/index.html', context)
 
+def get_related(topic):
+    plcontinue = None
+    cont = True
+    keywords = []
+
+    while cont:
+        r = requests.get("https://en.wikipedia.org/w/api.php?action=query&prop=links&format=json&titles=" + topic + \
+                "&pllimit=500&redirects" + (("&plcontinue=" + plcontinue) if plcontinue else ""))
+
+        json = r.json()
+
+        for link in next(iter(json["query"]["pages"].values()))["links"]:
+            keywords.append(link["title"])
+
+        cont = "continue" in json
+        plcontinue = json["continue"]["plcontinue"] if "continue" in json else None
+    return keywords
+
 def get_topics(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -40,31 +59,27 @@ def get_topics(request):
             # ...
             # redirect to a new URL:
             topic = form.cleaned_data['topic']
+            rand_keywords = random.sample(keywords, num_rel_init)
+            graph = []
+            final_keywords = []
+            for currNode in rand_keywords:
+                graph[currNode] = []
+                for currNeighbor in get_related(currNode):
+                    if currNeighbor in rand_keywords:
+                        graph[currNode].append(currNeighbor)
+            sorted_keys = sorted(graph, key=lambda x: len(graph[x]), reversed=True)
+            for x in range(6):
+                final_keywords.append(sorted_keys(x))
+            print (final_keywords)    
 
-            plcontinue = None
-            cont = True
-            keywords = []
+            #print(keywords)
 
-            while cont:
-                r = requests.get("https://en.wikipedia.org/w/api.php?action=query&prop=links&format=json&titles=" + topic + \
-                        "&pllimit=500&redirects" + (("&plcontinue=" + plcontinue) if plcontinue else ""))
-
-                json = r.json()
-
-                for link in next(iter(json["query"]["pages"].values()))["links"]:
-                    keywords.append(link["title"])
-
-                cont = "continue" in json
-                plcontinue = json["continue"]["plcontinue"] if "continue" in json else None
-
-            print(keywords)
-
-            rand_keywords = random.sample(keywords, 10)
-            print(rand_keywords)
+            #rand_keywords = random.sample(keywords, 10)
+            # print(rand_keywords)
 
             result_list = []
 
-            for word in rand_keywords:
+            for word in final_keywords:
                 word = word.replace (" ", "+")
                 r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
                 json = r.json()
