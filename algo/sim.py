@@ -3,7 +3,7 @@ import math
 pos_scores = [0.17, 0.23, 0.14, 0.08, 0.05, 0.04, 0.06, 0.04, 0.04, 0.15, 0]
 
 def title_score(sentence, title):
-    return csim(sentence, title)
+    return csim(words(sentence), (title))
 
 def keyword_score(sentence, keyword):
         
