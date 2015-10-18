@@ -315,8 +315,9 @@ def summarize(sentences, title, keywords, summary_size):
     print ("in summary!")
     print ("titles: ", title)
     print ("keywords", keywords)
+    print("sentences", sentences)
     scores, sim_matrix = sentences_scores(sentences, title, keywords)
-    print("scentences!")
+    print("sentences!")
    
     print("sorting")
     sorted_sentences = sorted(sentences, key=lambda s: scores[s], reverse=True)[0:2*summary_size]

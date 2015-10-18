@@ -100,7 +100,7 @@ def get_topics(request):
                 #     print ("exception")
                 #     pass
 
-            return detail(request, t.pk)
+            return HttpResponseRedirect(reverse('detail', args=[t.pk]))
             #### NYT api call ####
 
             # for word in rand_keywords:

@@ -46,7 +46,7 @@
 			</div>
 			<div class="card-action "><a href="{% url 'detail' topic.id %}" class="blue-text text-darken-4">View Summary</a>
 				{% if user.is_authenticated %}
-				<a class="waves-effect waves-light btn blue darken-2 white-text" href="{% url 'subscribe' topic.id %}"><i class="material-icons left">done</i>Suscribe</a>
+				<a class="waves-effect waves-light btn pink accent-1 white-text" href="{% url 'subscribe' topic.id %}"><i class="material-icons left">done</i>Suscribe</a>
 				{% endif %}
 			</div>
 		</div>
