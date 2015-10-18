@@ -12,7 +12,11 @@ from .forms import UserForm, UserProfileForm, TopicForm
 from .models import Topic, UserProfile
 from .bing_search import run_query
 import random
+<<<<<<< HEAD
 num_rel_init = 20
+=======
+from newspaper import Article
+>>>>>>> 91c588ef7ffd43eea93bef0345f8d26e27760e85
 
 # from alchemyapi import AlchemyAPI
 # alchemyapi = AlchemyAPI()
@@ -88,9 +92,33 @@ def get_topics(request):
 
             # result_list = []
 
+
             # for word in rand_keywords:
-            #     l = run_query(word)
-            #     result_list += l
+            #     word = word.replace (" ", "+")
+                
+            #     # r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ word + '&fl=web_url&api-key=' + KEY)
+            #     r = requests.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=body:'+ word + '&fl=web_url&api-key=' + KEY)
+            #     json = r.json()
+            #     for i in json["response"]["docs"]:
+            #         url = i['web_url']
+            #         a = Article(url)
+            #         a.download()
+            #         a.parse()
+            #         print (a.text, "\n")
+            #         print ("================= \n ================= \n")
+            #         result_list.append(url)
+
+            for word in rand_keywords:
+                links = run_query(word)
+                for i in links:
+                    url = i["link"]
+                    a = Article(url)
+                    a.download()
+                    a.parse()
+                    print (a.text, "\n")
+                    print ("================= \n================= \n")
+
+                result_list += links
 
             return render(request, 'summarizer/index.html', {'result_list': result_list})
 
