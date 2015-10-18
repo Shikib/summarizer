@@ -12,8 +12,9 @@ def run_query(search_terms):
     # Specify how many results we wish to be returned per page.
     # Offset specifies where in the results list to start from.
     # With results_per_page = 10 and offset = 11, this would start from page 2.
-    results_per_page = 3
+    results_per_page = 8
     offset = 0
+    sort = "'Relevance'"
 
     # Wrap quotes around our query terms as required by the Bing API.
     # The query we will then use is stored within variable query.
@@ -24,12 +25,15 @@ def run_query(search_terms):
 
     # Construct the latter part of our request's URL.
     # Sets the format of the response to JSON and sets other properties.
-    search_url = "{0}{1}?$format=json&$top={2}&$skip={3}&Query={4}".format(
+    search_url = "{0}{1}?$format=json&$top={2}&$skip={3}&Query={4}&NewsSortBy={5}".format(
         root_url,
         source,
         results_per_page,
         offset,
-        query)
+        query,
+        sort)
+
+    print(search_url)
 
     # Setup authentication with the Bing servers.
     # The username MUST be a blank string, and put in your API key!

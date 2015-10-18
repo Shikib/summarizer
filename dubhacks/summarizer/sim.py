@@ -221,6 +221,8 @@ def dbfs(sentence, keywords):
 def length_score(sentence):
     ideal = 20
     word_count = len(words(sentence))
+    if word_count < 10 or word_count > 30:
+        return 0.0
     return abs(ideal - word_count)/ideal
 
 def position_score(pos, sentence_count):
@@ -228,8 +230,8 @@ def position_score(pos, sentence_count):
     return pos_scores[math.floor(normalize_pos*10)]
 
 def relevance_sentence_score(sentence, title, keywords, pos, sentence_count):
-    score = 0.25*title_score(sentence, title) + 0.4*keyword_score(sentence, keywords) + \
-        0.1*length_score(sentence) + 0.25*position_score(pos, sentence_count)
+    score = 0.25*title_score(sentence, title) + 0*5*keyword_score(sentence, keywords) + \
+        0.15*length_score(sentence) + 0.1*position_score(pos, sentence_count)
     if not len(keywords):
         return score / 0.6
     else:

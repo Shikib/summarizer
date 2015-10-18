@@ -9,8 +9,8 @@ import summarizer.sim
 
 def get_urls(best_words):
     links = []
-    for word in best_words:
-        links += run_query(word)
+
+    links += run_query(" ".join(best_words))
     return links
 
 def get_wiki(topic):
