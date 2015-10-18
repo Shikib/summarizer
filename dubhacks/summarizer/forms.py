@@ -16,4 +16,4 @@ class UserProfileForm(forms.ModelForm):
         # fields = ('website', 'picture')
 
 class TopicForm(forms.Form):
-    topic = forms.CharField(label='topic', max_length=100)
+    search = forms.CharField(label='search', max_length=100)
