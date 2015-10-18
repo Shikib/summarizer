@@ -25,12 +25,6 @@ def get_wiki(topic):
     return text.lower()
 
 def partition(keywords):
-    length = len(keywords)
-    for i in range (0, length):
-        keyword = keywords[i]
-        split_words = keyword.split()
-        if len(split_words) > 1:
-            keywords += split_words
     return set([i.replace(")", "").replace("(", "") for i in keywords])
 
 def get_keywords(topic):

@@ -247,8 +247,9 @@ def relevance_scores(sentences, title, keywords):
     return scores
 
 def scale(cscores, rscores):
+    cscoresl = [ pow(i,4) for i in cscores.values() ]
     maxr = max(list(rscores.values()))
-    maxc = max(list(cscores.values()))
+    maxc = max(list(cscoresl))
     for key in cscores.keys():
         cscores[key] *= (maxr/maxc)
     return cscores

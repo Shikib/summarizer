@@ -34,7 +34,7 @@ import requests
 # Create your views here.
 
 def index(request):
-    latest_topic_list = Topic.objects.order_by('-title')
+    latest_topic_list = Topic.objects.all()
     context = {'latest_topic_list': latest_topic_list}
     return render(request, 'summarizer/index.html', context)
 
@@ -70,7 +70,8 @@ def get_topics(request):
 
             keyword_scores = summarizer.data.keyword_scores(topic, best_words)
             print("get urls")
-            urls = summarizer.data.get_urls(list(best_words)[:min(3, len(best_words))])
+            # urls = summarizer.data.get_urls(list(best_words)[:min(3, len(best_words))])
+            urls = summarizer.data.get_urls([topic])
 
             for link in urls:
                 url = link['link']
@@ -88,7 +89,7 @@ def get_topics(request):
                 text = a.text
                 lines = [t.strip() for t in re.split("(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s", text.replace("\n", " "))]
                 print("starting summary")
-                summary = summarizer.sim.summarize(lines, a.title, keyword_scores, 3) 
+                summary = summarizer.sim.summarize(lines, a.title, keyword_scores, 10) 
 
                 title = a.title
 
@@ -183,6 +184,7 @@ def detail(request, topic_id):
 
     twit_results = get_tweets(topic.title)
     print (twit_results)
+    print(topic.summary_set.all)
 
     return render(request, 'summarizer/detail.html',
             { 'twitter_results': twit_results if len(twit_results) > 0 else None,
