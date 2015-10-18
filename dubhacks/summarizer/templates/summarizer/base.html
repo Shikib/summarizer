@@ -21,12 +21,11 @@
 <!--     {% block navbar} -->
     <nav>
         <div class="nav-wrapper">
-          <ul id="slide-out" class="side-nav">
+        <a href="#!" class="brand-logo center">Logo</a>
+        <ul class="left hide-on-med-and-down">
             <li><a href="/summarizer/"><i class="material-icons left">cloud</i>Home</a></li>
             <li><a href="/summarizer/subscriptions"><i class="material-icons left">list</i>Subscriptions</a></li>
         </ul>
-        <a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="mdi-navigation-menu"></i></a>
-        <a href="#!" class="brand-logo center">Logo</a>
         <ul class="right hide-on-med-and-down">
             {% if user.is_authenticated %}
             <li><a href="/summarizer/logout/"><i class="material-icons left">search</i>Logout</a></li>
