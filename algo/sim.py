@@ -150,18 +150,71 @@ def relevance_scores(sentences, title, keywords):
 
 def sentences_scores(sentences, title, keywords):
     rscores = relevance_scores(sentences, title, keywords)
-    cscores = centrality_scores(sentences)
+    cscores, sim_matrix = centrality_scores(sentences)
     scores = {}
     for s in sentences:
         scores[s] = math.sqrt(rscores[s]*cscores[s])
-    return scores    
+    return scores, sim_matrix
 
-def quick_select(sentences, k):
-    return []
+# find score of k-th best sentence
+# looks at [start, end)
+def quick_select(scores, k):
+    pivot = sentences[0]
+    left = []
+    right = []
+    for score in scores:
+        if score < pivot:
+            left.append(score)
+        else:
+            right.append(score)
+    if k < len(left):
+        return quick_select(left, k)
+    elif k > len(left):
+        return quick_select(right, k - len(left))
+    else:
+        return pivot
 
+def select_best(scores, k):
+    kth_best = quick_select(scores.values(), k)
+    sentences = []
+    for s in scores.keys()
+        if scores[s] >= kth_best:
+            sentences.append(s)
+
+    return sentences
+    
+def maximal_similarity(s, summary_sentences, sim_matrix):
+    maximal = 0.0
+    for s2 in summary_sentneces:
+        maximal = max(maximal, sim_matrix[s][s2])
+
+    return maximal
+
+def maximal_marginal_relevance(scores, sorted_sentences, summary_sentences, sim_matrix):   
+    lambd = 0.6
+    max_score = 0.0
+    max_sent = None
+    for s in sorted_sentences:
+        score = lambd*scores[s] - (1-lambd)*maximal_similarity(s, summary_sentences, sim_matrix)
+        if score > max_score:
+            max_score = score
+            max_sent = s
+
+    del sorted_sentences[max_sent]
+    return max_sent
+      
 def summarize(sentences, title, keywords, summary_size):
-    scores = sentences_scores(sentences, title, keywords)
-    return quick_select(sentences, summary_size)
+    scores, sim_matrix = sentences_scores(sentences, title, keywords)
+    sentences = select_best(sentences, summary_size*2)
+   
+    sorted_sentences = sorted(sentences, key=lambda s: scores[s], reverse=True) 
+    
+    sum_sentences = []
+    for i in range(0, summary_size):
+        sum_sentences.append(scores, sorted_sentences, summary_sentences, sim_matrix)
+
+    return sum_sentences
+    
 
 
 
