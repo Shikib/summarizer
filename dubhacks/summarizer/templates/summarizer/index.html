@@ -1,0 +1,37 @@
+{% extends "summarizer/base.html" %}
+
+{% block head_title %}Dubhacks{% endblock %}
+
+{% block content %}
+
+<div class="container">
+	{% if latest_topic_list %}
+	{% for topic in latest_topic_list %}
+	{% cycle 'row' '' as row silent %}
+	{% if row %}<div class="row">{% endif %}
+	<div class="col s6">
+		<div class="card blue-grey darken-1">
+			<div class="card-content white-text">
+				<span class="card-title">{{ topic.title }}</span>
+				<p>Pietistic skinless sociologistically ribaldly nonvibrating runlet mismated osmidrosis hairball scarabaeid unpillaged friendship enghien outdone.</p>
+			</div>
+			<div class="card-action">
+				<a href="{% url 'detail' topic.id %}">View Summary</a>
+				<a class="waves-effect waves-light btn"><i class="material-icons left">done</i>Suscribe</a>
+			</div>
+		</div>
+	</div>
+	{% if not row %}</div>{% endif %}
+	{% endfor %}
+	{% else %}
+	<div class="card blue-grey darken-1">
+		<div class="card-content white-text">
+			<span class="card-title">No Topics Avalible</span>
+		</div>
+	</div>
+	
+{% endif %}
+
+</div>
+
+{% endblock %}

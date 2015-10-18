@@ -1,0 +1,33 @@
+{% extends "summarizer/base.html" %}
+
+{% block head_title %}Dubhacks{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="center-align"><h1> Login </h1></div>
+
+    <div class="row">
+        <form id="login_form" method="post" action="/summarizer/login/" class="col s12">
+            {% csrf_token %}
+            <div class="row ">
+                <div class="input-field col s6 offset-s3">
+                  <input type="text" name="username" value="" size="50" class="validate">
+                  <label for="password">Username</label>
+              </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s6 offset-s3">
+              <input type="password" name="password" value="" size="50" class="validate">
+              <label for="email">Password</label>
+          </div>
+      </div>
+      <div class="center-align">
+          <button class="btn waves-effect waves-light center-block" type="submit" name="action">Submit
+            <i class="material-icons right">send</i>
+        </button>
+    </div>
+</form>
+</div>
+</div>
+{% endblock %}

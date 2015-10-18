@@ -1,0 +1,30 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'dubhacks/style.css' %}" />
+<!-- Compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+
+<body>
+      <div class="container">
+<div class="row">
+	<div class="col s12">
+		<div class="card blue-grey darken-1">
+			<div class="card-content white-text">
+				<span class="card-title">{{ topic.title }}</span>
+						{% for summary in topic.summary_set.all %}
+	<!-- 					<div class="divider"></div> -->
+						<div class="section">
+						{{ summary.text }}
+					</div>
+						{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+
+</div>
+    </body>
+
+<!-- Compiled and minified JavaScript -->
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
