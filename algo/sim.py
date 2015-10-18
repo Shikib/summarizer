@@ -3,7 +3,10 @@ import math, string
 import numpy as np
 from scipy.sparse import csc_matrix
 
-def pageRank(G, s = .85, maxerr = .001):
+pos_scores = [0.17, 0.23, 0.14, 0.08, 0.05, 0.04, 0.06, 0.04, 0.04, 0.15, 0]
+epsilon = 1e-10
+
+def page_rank(G, s = .85, maxerr = .001):
     """
     Computes the pagerank for each of the n states.
     Used in webpage ranking and text summarization using unweighted
@@ -20,7 +23,14 @@ def pageRank(G, s = .85, maxerr = .001):
     maxerr: if the sum of pageranks between iterations is bellow this we will
             have converged. Defaults to 0.001
     """
-    n = G.shape[0]
+    n = len(G[0])
+    
+    for i in range(0, len(G)):
+        column = G[i]
+        summ = sum(column)
+        for j in range(0, len(G)):
+            column[j] /= summ              
+        
 
     # transform G into markov matrix M
     M = csc_matrix(G,dtype=np.float)
@@ -36,7 +46,7 @@ def pageRank(G, s = .85, maxerr = .001):
     while np.sum(np.abs(r-ro)) > maxerr:
         ro = r.copy()
         # calculate each pagerank at a time
-        for i in xrange(0,n):
+        for i in range(0,n):
             # inlinks of state i
             Ii = np.array(M[:,i].todense())[:,0]
             # account for sink states
@@ -49,22 +59,6 @@ def pageRank(G, s = .85, maxerr = .001):
     # return normalized pagerank
     return r/sum(r)
 
-
-
-
-if __name__=='__main__':
-    # Example extracted from 'Introduction to Information Retrieval'
-    G = np.array([[0,0,1,0,0,0,0],
-                  [0,1,1,0,0,0,0],
-                  [1,0,1,1,0,0,0],
-                  [0,0,0,1,1,0,0],
-                  [0,0,0,0,0,0,1],
-                  [0,0,0,0,0,1,1],
-                  [0,0,0,1,1,0,1]])
-
-    print pageRank(G,s=.86)
-pos_scores = [0.17, 0.23, 0.14, 0.08, 0.05, 0.04, 0.06, 0.04, 0.04, 0.15, 0]
-epsilon = 1e-10
 
 
 def import_idfs(filename):
@@ -146,22 +140,42 @@ def centrality_scores(sentences):
     for w in freqs.keys():
         tfidfs[w] = freqs[w] * (idfs[w] if w in idfs else 1)
 
-    #incidence = [[0 for i in range(len(word_lists))] for j in range(len(word_lists))]
+    matrix = [[0 for i in range(len(word_lists))] for j in range(len(word_lists))]
     incidence = {}
-
-    for s1 in sentences:
+    
+   
+    for i in range(0, len(sentences)):
+        s1 = sentences[i]
         incidence[s1] = {}
-        for s2 in sentences:
-            #incidence[i][j] = incidence[j][i] = csim(tfidfs, word_lists[i], word_lists[j])
+        for j in range(0, len(sentences)):
+            s2 = sentences[j]
+            matrix[i][j] = csim(tfidfs, word_lists[i], word_lists[j])
             incidence[s1][s2] = csim(tfidfs, words(s1), words(s2))
+           
+    
+    print(incidence)
+    pagerank_scores = page_rank(matrix)
 
-    return incidence
+    scores = {}
+    for i in range(0, len(sentences)):
+        s = sentences[i]
+        scores[s] = pagerank_scores[i]    
+ 
+    return scores, incidence
 
-print(centrality_scores(["the dog", "the cat", "the dog and the cat"]))
 
 
 def title_score(sentence, title):
-    return csim(words(sentence), (title))
+    word_lists = [words(s) for s in [sentence, title]]
+    tfidfs = { }
+    freqs = tfs([i for l in word_lists for i in l]) # flatten word list
+    
+    for w in freqs.keys():
+        tfidfs[w] = freqs[w] * (idfs[w] if w in idfs else 1)
+
+    print(csim(tfidfs, words(sentence), words(title)))
+    return csim(tfidfs, words(sentence), words(title))
+   
 
 def keyword_score(sentence, keywords):
     return sbfs(sentence, keywords) * dbfs(sentence, keywords)    
@@ -200,15 +214,19 @@ def dbfs(sentence, keywords):
     return summ/(keyword_count - 1) 
     
 def length_score(sentence):
-    return lenth(sentence)
+    ideal = 20
+    word_count = len(words(sentence))
+    return abs(ideal - word_count)/ideal
 
 def position_score(pos, sentence_count):
     normalize_pos = pos/sentence_count
     return pos_scores[math.floor(normalize_pos*10)]
 
 def relevance_sentence_score(sentence, title, keywords, pos, sentence_count):
-    return 0.25*title_score(sentence, title) + 0.4*keyword_score(sentence, keywords) + \
-        0.1*length_score(sentence) + 0.25*position_score(pos, sentence_count)
+    #return 0.25*title_score(sentence, title) + 0.4*keyword_score(sentence, keywords) + \
+     #   0.1*length_score(sentence) + 0.25*position_score(pos, sentence_count)
+    return (0.25*title_score(sentence, title) +  \
+        0.1*length_score(sentence) + 0.25*position_score(pos, sentence_count))/0.6
 
 def relevance_scores(sentences, title, keywords):
     scores = {}
@@ -217,9 +235,19 @@ def relevance_scores(sentences, title, keywords):
         scores[s] = relevance_sentence_score(s, title, keywords, i, len(sentences))
     return scores
 
+def scale(cscores, rscores):
+    maxr = max(list(rscores.values()))
+    maxc = max(list(cscores.values()))
+    for key in cscores.keys():
+        cscores[key] *= (maxr/maxc)
+    return cscores
+    
+
 def sentences_scores(sentences, title, keywords):
     rscores = relevance_scores(sentences, title, keywords)
     cscores, sim_matrix = centrality_scores(sentences)
+    csores = scale(cscores, rscores)
+
     scores = {}
     for s in sentences:
         scores[s] = math.sqrt(rscores[s]*cscores[s])
@@ -228,23 +256,24 @@ def sentences_scores(sentences, title, keywords):
 # find score of k-th best sentence
 # looks at [start, end)
 def quick_select(scores, k):
-    pivot = sentences[0]
+    pivot = scores[0]
     left = []
     right = []
     for score in scores:
         if score < pivot:
             left.append(score)
-        else:
+        elif score > pivot:
             right.append(score)
+
     if k < len(left):
         return quick_select(left, k)
     elif k > len(left):
-        return quick_select(right, k - len(left))
+        return quick_select(right, k - len(left) - 1)
     else:
         return pivot
 
 def select_best(scores, k):
-    kth_best = quick_select(scores.values(), k)
+    kth_best = quick_select(list(scores.values()), k)
     sentences = []
     for s in scores.keys():
         if scores[s] >= kth_best:
@@ -254,7 +283,7 @@ def select_best(scores, k):
     
 def maximal_similarity(s, summary_sentences, sim_matrix):
     maximal = 0.0
-    for s2 in summary_sentneces:
+    for s2 in summary_sentences:
         maximal = max(maximal, sim_matrix[s][s2])
 
     return maximal
@@ -269,22 +298,27 @@ def maximal_marginal_relevance(scores, sorted_sentences, summary_sentences, sim_
             max_score = score
             max_sent = s
 
-    del sorted_sentences[max_sent]
+    if max_sent:
+        sorted_sentences.remove(max_sent)
+
     return max_sent
       
 def summarize(sentences, title, keywords, summary_size):
+    if summary_size >= len(sentences):    
+        return sentences
+
     scores, sim_matrix = sentences_scores(sentences, title, keywords)
-    sentences = select_best(sentences, summary_size*2)
+    sentences = select_best(scores, min(len(sentences), summary_size*2))
    
     sorted_sentences = sorted(sentences, key=lambda s: scores[s], reverse=True) 
     
     sum_sentences = []
     for i in range(0, summary_size):
-        sum_sentences.append(scores, sorted_sentences, summary_sentences, sim_matrix)
+        best_sent = maximal_marginal_relevance(scores, sorted_sentences, sum_sentences, sim_matrix)
+        if best_sent:
+            sum_sentences.append(best_sent)
 
     return sum_sentences
-    
 
 
-
-
+print(summarize(["PageRank works by counting the number and quality of links to a page to determine a rough estimate of how important the website is", "The underlying assumption is that more important websites are likely to receive more links from other websites", "The PageRank algorithm outputs a probability distribution used to represent the likelihood that a person randomly clicking on links will arrive at any particular page", "PageRank can be calculated for collections of documents of any size", "It is assumed in several research papers that the distribution is evenly divided among all documents in the collection at the beginning of the computational process", "The PageRank computations require several passes, called iterations, through the collection to adjust approximate PageRank values to more closely reflect the theoretical true value"], "PageRank", [], 2))
