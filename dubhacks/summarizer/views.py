@@ -74,7 +74,7 @@ def get_topics(request):
 
             sorted_keys = sorted(graph, key=lambda x : len(graph[x]), reverse=True)
 
-            final_keywords = list(islice(sorted_keys, 5))
+            final_keywords = list(islice(sorted_keys, 5)).append(topic)
             print(final_keywords)    
 
             result_list = []
