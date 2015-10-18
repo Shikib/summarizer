@@ -1,6 +1,5 @@
 import math, string
 import re
-
 import numpy as np
 from scipy.sparse import csc_matrix
 
@@ -80,7 +79,7 @@ def import_idfs(filename):
 
     return ret
 
-idfs = import_idfs("../data/BingBodyDec13_Top100KWords.txt")
+idfs = import_idfs("dubhacks/summarizer/data-files/BingBodyDec13_Top100KWords.txt")
 
 def tfs(words):
     """
@@ -309,9 +308,12 @@ def summarize(sentences, title, keywords, summary_size):
     if summary_size >= len(sentences):    
         return sentences
 
+    print ("in summary!")
     scores, sim_matrix = sentences_scores(sentences, title, keywords)
+    print("scentences!")
     sentences = select_best(scores, min(len(sentences), summary_size*2))
    
+    print("sorting")
     sorted_sentences = sorted(sentences, key=lambda s: scores[s], reverse=True) 
     
     sum_sentences = []
@@ -739,6 +741,5 @@ Above this line, known as the Fall Line, crystalline rocks from the Piedmont Pla
 Drawing (Victoria Roberts) 
 """
 
-lines = [t.strip() for t in re.split("(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s", text.replace("\n", " "))]
 
 #print(summarize(lines, "Computers", [], 2))

@@ -16,6 +16,7 @@ class Topic(models.Model):
 
 class Summary(models.Model):
 	text = models.TextField()
+	url = models.URLField(blank=True)
 	date = models.DateTimeField('date updated')
 	topics = models.ManyToManyField(Topic)
 	def __str__(self):

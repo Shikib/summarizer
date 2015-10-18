@@ -22,7 +22,7 @@
     <nav>
         <div class="nav-wrapper">
 
-      <form action="/summarizer/your-name/" method="post">
+      <form action="/summarizer/search" method="post">
         <div class="input-field search-bar" style="display:none;" >
             {% csrf_token %}
           <input placeholder="What are you interested in today?" id="search" type="search" name="search" required>
@@ -66,7 +66,6 @@
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
 <script> 
-$(".button-collapse").sideNav();
 $(".search-button").click(function() {
     $(".search-bar").show();
     $(".normal-stuff").hide();
