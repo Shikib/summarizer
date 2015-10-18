@@ -18,6 +18,9 @@ import summarizer.data
 import summarizer.sim
 import re
 
+num_rel_init = 10
+
+
 # from alchemyapi import AlchemyAPI
 # alchemyapi = AlchemyAPI()
 
@@ -34,8 +37,6 @@ def index(request):
 	context = {'latest_topic_list': latest_topic_list}
 	return render(request, 'summarizer/index.html', context)
 
-
-
 def get_topics(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -46,7 +47,8 @@ def get_topics(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            topic = form.cleaned_data['topic']
+
+            topic = form.cleaned_data['search']
             print(topic)
             print("dfq")
             keywords = summarizer.data.get_keywords(topic)
@@ -75,6 +77,7 @@ def get_topics(request):
 
 
             #### NYT api call ####
+
             # for word in rand_keywords:
             #     word = word.replace (" ", "+")
                 
@@ -113,6 +116,24 @@ def subscriptions(request):
 	# return HttpResponse(template.render(context))
 	# context = {'subscription_list': subscription_list}
 	return render(request, 'summarizer/subscriptions.html', {'subscription_list': subscription_list})
+
+@login_required(login_url='/summarizer/login')
+def subscribe(request, topic_id):
+    user = request.user
+    try:
+        topic = Topic.objects.get(pk=topic_id)
+    except Topic.DoesNotExist:
+        raise Http404("Topic does not exist")
+    userprofile = UserProfile.objects.get(user=user)
+    userprofile.topic_set.add(topic)
+
+    # template = loader.get_template('dubhacks/index.html')
+    # context = RequestContext(request, {
+ #        'latest_topic_list': latest_topic_list,
+ #    })
+    # return HttpResponse(template.render(context))
+    # context = {'subscription_list': subscription_list}
+    return HttpResponse("Subscribed!")
 
 def detail(request, topic_id):
 	try:

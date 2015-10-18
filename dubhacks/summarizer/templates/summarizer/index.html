@@ -5,12 +5,19 @@
 {% block content %}
 
 <div class="container">
-	<form action="/summarizer/your-name/" method="post">
+
+        
+
+<!-- 	<form action="/summarizer/your-name/" method="post">
 	{% csrf_token %}
-    <label for="topic">Topic: </label>
-    <input id="topic" type="text" name="topic" value="">
+	<div class="row">
+		<div class="input-field col s6 offset-s3">
+    <label for="search">Topic: </label>
+    <input id="search" type="text" name="search" value="">
+    </div>
     <input type="submit" value="OK">
-	</form>
+</div>
+	</form> -->
 
 	{% if result_list %}
         <!-- Display search results in an ordered list -->
@@ -39,6 +46,7 @@
 			</div>
 			<div class="card-action">
 				<a href="{% url 'detail' topic.id %}">View Summary</a>
+				<a class="waves-effect waves-light btn " href="{% url 'subscribe' topic.id %}"><i class="material-icons left">done</i>Suscribe</a>
 			</div>
 		</div>
 	</div>

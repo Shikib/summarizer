@@ -21,21 +21,38 @@
 <!--     {% block navbar} -->
     <nav>
         <div class="nav-wrapper">
-          <ul id="slide-out" class="side-nav">
+
+      <form action="/summarizer/your-name/" method="post">
+        <div class="input-field search-bar" style="display:none;" >
+            {% csrf_token %}
+          <input placeholder="What are you interested in today?" id="search" type="search" name="search" required>
+          <label for="search"><i class="material-icons">search</i></label>
+          <i class="close-search material-icons">close</i>
+        </div>
+      </form>
+
+        <a href="#!" class="normal-stuff brand-logo center">Logo</a>
+        
+        <div class="normal-stuff">             
+        <ul class="left">
             <li><a href="/summarizer/"><i class="material-icons left">cloud</i>Home</a></li>
             <li><a href="/summarizer/subscriptions"><i class="material-icons left">list</i>Subscriptions</a></li>
         </ul>
-        <a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="mdi-navigation-menu"></i></a>
-        <a href="#!" class="brand-logo center">Logo</a>
-        <ul class="right hide-on-med-and-down">
+        <ul class="right">
             {% if user.is_authenticated %}
+            <li class="search-button"><a href="#"><i class="material-icons left">search</i>Search</a></li>
             <li><a href="/summarizer/logout/"><i class="material-icons left">search</i>Logout</a></li>
+
             {% else %}
+            <li class="search-button"><a href="#"><i class="material-icons left">search</i>Search</a></li>
             <li><a href="/summarizer/login/"><i class="material-icons left">search</i>Login</a></li>
             <li><a href="/summarizer/register/"><i class="material-icons right">view_module</i>Register</a></li>
             {% endif %}
         </ul>
+        </div>
     </div>
+
+
 </nav>
 <!-- {% endblock} -->
 
@@ -48,6 +65,21 @@
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
-<script> $(".button-collapse").sideNav(); </script>
+<script> 
+$(".button-collapse").sideNav();
+$(".search-button").click(function() {
+    $(".search-bar").show();
+    $(".normal-stuff").hide();
+    $("#search").focus();
+});
+$(".close-search").click(function() {
+    $(".normal-stuff").show();
+    $(".search-bar").hide();
+});
+$("#search").focusout(function() {
+    $(".normal-stuff").show();
+    $(".search-bar").hide();
+});
+</script>
 {% endblock %}
 </html>
