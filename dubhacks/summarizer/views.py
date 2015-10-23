@@ -50,7 +50,6 @@ def get_topics(request):
             # redirect to a new URL:
             topic = form.cleaned_data['search'].lower()
             
-
             valid_topics = Topic.objects.filter(title=topic, updated__day=timezone.now().day)
 
             print(valid_topics)
@@ -185,6 +184,7 @@ def detail(request, topic_id):
     twit_results = get_tweets(topic.title)
     print (twit_results)
     print(topic.summary_set.all)
+    
 
     return render(request, 'summarizer/detail.html',
             { 'twitter_results': twit_results if len(twit_results) > 0 else None,
